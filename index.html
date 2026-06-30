@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fruit Rush</title>
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    /* Body simple : Phaser positionne lui-même le canvas via
+       Scale.CENTER_BOTH dans main.js. Pas de flex ici sinon
+       les deux centrages se cumulent et créent un décalage. */
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #222;
+      overflow: hidden;
+    }
+    canvas {
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+  </style>
+</head>
+<body>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
