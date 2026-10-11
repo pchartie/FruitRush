@@ -8,7 +8,7 @@ Il se joue dans le navigateur, avec un classement en ligne partagé entre tous l
 <p align="center">
   <img src="docs/screenshots/menu.png" width="32%" alt="Menu et choix du héros">
   <img src="docs/screenshots/jeu.png" width="32%" alt="Niveau 1 : fruits et trampoline">
-  <img src="docs/screenshots/pieges.png" width="32%" alt="Pics et caisse à casser">
+  <img src="docs/screenshots/terres-brulees.png" width="32%" alt="Niveau 5, Terres Brûlées : feu, trampoline et pics">
 </p>
 
 ---
