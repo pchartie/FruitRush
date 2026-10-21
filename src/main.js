@@ -31,4 +31,7 @@ const config = {
   pixelArt: true,
 };
 
-new Phaser.Game(config);
+const game = new Phaser.Game(config);
+
+// En développement seulement : accès au jeu depuis la console (tests, débogage).
+if (import.meta.env.DEV) window.game = game;

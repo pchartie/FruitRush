@@ -6,6 +6,7 @@ import { buildSectionLabel } from '../ui/buildSectionLabel.js';
 import { setupMuteToggle } from '../ui/setupMuteToggle.js';
 import { loadAudio } from '../audio/loadAudio.js';
 import { Sfx } from '../audio/Sfx.js';
+import { LEVELS } from '../levels/levels.js';
 
 const CHARS = ['virtual_guy', 'pink_man', 'ninja_frog', 'mask_dude'];
 const CHAR_LABELS = {
@@ -34,6 +35,8 @@ export class MenuScene extends Phaser.Scene {
 
   create() {
     const cx = CONFIG.width / 2;
+    // La scène est réutilisée à chaque retour au menu.
+    this.starting = false;
 
     this.cameras.main.setBackgroundColor('#2d5016');
 
@@ -125,17 +128,41 @@ export class MenuScene extends Phaser.Scene {
       preset: 'green',
       icon: 'play',
       width: 260, height: 76,
-      onClick: () => {
-        this.registry.set('char', this.selectedChar);
-        this.registry.set('currentLevel', 1);
-        this.cameras.main.fadeOut(300);
-        this.time.delayedCall(300, () => {
-          this.scene.start('GameScene', { char: this.selectedChar, level: 1 });
-        });
-      },
+      onClick: () => this._startLevel(1),
     });
 
+    // === Accès direct aux niveaux : en développement seulement (npm run dev) ===
+    // Boutons 1 à N sous « Jouer », ou touches 1 à N du clavier.
+    if (import.meta.env.DEV) {
+      const nums = Object.keys(LEVELS).map(Number);
+      const gap = 64;
+      const x0 = cx - ((nums.length - 1) * gap) / 2 + 30;
+      this.add.text(x0 - 64, 652, 'DEV', {
+        fontSize: '20px', fontFamily: 'Arial Black, Arial, sans-serif',
+        color: '#ffd700', stroke: '#000', strokeThickness: 4,
+      }).setOrigin(0.5);
+      nums.forEach((n, i) => {
+        buildButton(this, {
+          x: x0 + i * gap, y: 652, label: String(n), preset: 'gray',
+          width: 52, height: 44, fontSize: 22,
+          onClick: () => this._startLevel(n),
+        });
+        this.input.keyboard.on(`keydown-${['ZERO', 'ONE', 'TWO', 'THREE', 'FOUR', 'FIVE', 'SIX', 'SEVEN', 'EIGHT', 'NINE'][n]}`, () => this._startLevel(n));
+      });
+    }
+
     this.cameras.main.fadeIn(500);
+  }
+
+  _startLevel(level) {
+    if (this.starting) return;
+    this.starting = true;
+    this.registry.set('char', this.selectedChar);
+    this.registry.set('currentLevel', level);
+    this.cameras.main.fadeOut(300);
+    this.time.delayedCall(300, () => {
+      this.scene.start('GameScene', { char: this.selectedChar, level });
+    });
   }
 
   _select(char) {

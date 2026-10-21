@@ -16,12 +16,6 @@ export const CONFIG = {
   width: 1000,
   height: 750,
 
-  // Monde (scroll horizontal)
-  world: {
-    width: 4800,
-    height: 600,
-  },
-
   // Joueur
   player: {
     speed: 260,
@@ -49,7 +43,7 @@ export const CONFIG = {
   // Bonus de fin de jeu : chaque vie restante rapporte ce nombre de points
   // (3 vies × 200 = 600 points max).
   lifeBonus: 200,
-  // Temps imparti par niveau (secondes). À 0 : on recommence le niveau en
-  // perdant un cœur (game over si c'était le dernier).
+  // Temps imparti par défaut (secondes), si le niveau ne fixe pas son `time`.
+  // À 0 : on recommence le niveau en perdant un cœur (game over si c'était le dernier).
   levelTime: 60,
 };

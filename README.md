@@ -1,14 +1,18 @@
 # Fruit Rush
 
 Jeu de plateforme 2D en pixel-art. Choisissez votre héros, courez, sautez, ramassez un maximum de fruits
-et atteignez la coupe avant la fin du chrono, à travers **5 niveaux** de plus en plus piégés.
+et atteignez la coupe avant la fin du chrono, à travers **5 niveaux** qui ont chacun leur forme et leur piège
+phare : une plaine de piliers, une tour à gravir, des cavernes plongées dans le noir, une forteresse et un sprint au-dessus du vide.
 
 Il se joue dans le navigateur, avec un classement en ligne partagé entre tous les joueurs.
 
 <p align="center">
   <img src="docs/screenshots/menu.png" width="32%" alt="Menu et choix du héros">
-  <img src="docs/screenshots/jeu.png" width="32%" alt="Niveau 1 : fruits et trampoline">
-  <img src="docs/screenshots/terres-brulees.png" width="32%" alt="Niveau 5, Terres Brûlées : feu, trampoline et pics">
+  <img src="docs/screenshots/jeu.png" width="32%" alt="Niveau 1, Plaine verte : piliers, fruits et trampoline">
+  <img src="docs/screenshots/bonbon.png" width="32%" alt="Niveau 2, Pays de Bonbon : ascension, souffleurs et scie">
+  <img src="docs/screenshots/cavernes.png" width="32%" alt="Niveau 3, Cavernes oubliées : dans le noir, plateformes qui tombent et pointes au plafond">
+  <img src="docs/screenshots/forteresse.png" width="32%" alt="Niveau 4, Forteresse maudite : Spike Heads, scie et passage bas">
+  <img src="docs/screenshots/terres-brulees.png" width="32%" alt="Niveau 5, Terres Brûlées : îlots, caisse et flèches">
 </p>
 
 ---
@@ -16,16 +20,16 @@ Il se joue dans le navigateur, avec un classement en ligne partagé entre tous l
 ## Règles du jeu
 
 ### Le but
-Traversez chaque niveau de gauche à droite et touchez la **coupe** à l'arrivée. En chemin, ramassez les
-fruits et cassez les caisses pour gagner des points. Finissez les 5 niveaux pour remporter la partie.
+Atteignez la **coupe** au bout de chaque niveau. En chemin, ramassez les fruits et cassez les caisses pour
+gagner des points. Finissez les 5 niveaux pour remporter la partie.
 
-| Niveau | Décor |
-|:-:|---|
-| 1 | Plaine verte |
-| 2 | Pays de Bonbon |
-| 3 | Cavernes oubliées |
-| 4 | Forteresse maudite |
-| 5 | Terres Brûlées |
+| Niveau | Parcours | Chrono |
+|:-:|---|:-:|
+| 1 | **Plaine verte** : la mise en jambes, de pilier en pilier, avec un trampoline, des pics, un feu et une plateforme fragile | 1:00 |
+| 2 | **Pays de Bonbon** : une tour à gravir de bas en haut, de planche en planche, à coups de trampolines et de souffleurs | 1:15 |
+| 3 | **Cavernes oubliées** : une descente dans le noir, où l'on ne voit qu'autour de soi ; puits, galeries basses, pointes au plafond, gouffres | 1:15 |
+| 4 | **Forteresse maudite** : trois étages en zigzag, gardés par des Spike Heads, des scies et des rangées de feux | 1:30 |
+| 5 | **Terres Brûlées** : un sprint d'îlot en îlot au-dessus du vide, avec des plateformes fragiles et des flèches qui relancent en l'air | 1:20 |
 
 ### Commandes
 | Action | Touches (par défaut) |
@@ -46,18 +50,23 @@ Le choix est purement esthétique : ils se jouent tous de la même façon.
 ### Les cœurs et le chrono
 - Vous commencez avec **3 cœurs**.
 - **Toucher un piège** fait perdre un cœur. Vous restez sur place et clignotez, invincible pendant 1,5 s.
-- **Tomber dans un trou** fait perdre un cœur et vous ramène au début du niveau.
-- Chaque niveau dure **60 secondes**. Si le temps est écoulé, vous perdez un cœur et le niveau recommence.
+- **Tomber dans un trou** fait perdre un cœur et vous ramène au dernier **checkpoint** touché (drapeau),
+  ou au début du niveau.
+- Chaque niveau a son **chrono** (de 1:00 à 1:30). Si le temps est écoulé, vous perdez un cœur et le niveau recommence.
 - Plus de cœurs : **game over**.
 
 ### Les obstacles
 | Obstacle | Effet |
 |---|---|
-| Pics | Font perdre un cœur |
+| Pics | Au sol ou au plafond : font perdre un cœur |
 | Feu | S'allume et s'éteint en rythme : dangereux seulement quand il brûle |
-| Scie | Tourne et patrouille d'un côté à l'autre : toujours dangereuse |
+| Scie | Tourne et parcourt sa chaîne, à l'horizontale ou à la verticale : toujours dangereuse |
+| Spike Head | Bloc à pointes qui s'abat quand vous passez dessous, puis remonte lentement |
 | Plateforme fragile | Tremble quand on monte dessus, puis tombe : ne traînez pas |
 | Trampoline | Vous propulse très haut et redonne le double saut |
+| Souffleur | Son courant d'air vous soulève : laissez-vous porter, puis sautez de côté |
+| Flèche | Bulle en l'air qui vous relance vers le haut et redonne le double saut |
+| Checkpoint | Drapeau qui se lève à votre passage : c'est là que vous réapparaissez après une chute |
 | Caisse | Se casse quand on la tape **par en dessous** |
 
 ### Les points
@@ -68,7 +77,7 @@ Le choix est purement esthétique : ils se jouent tous de la même façon.
 | Temps restant à l'arrivée | **+1** par seconde |
 | Cœur restant à la fin de la partie | **+200** par cœur |
 
-Le score maximum possible est de **2 590 points**.
+Le score maximum possible est de **2 790 points**.
 
 ### Le classement
 À la fin de la partie (victoire ou game over), si votre score entre dans le **top 15**, vous entrez votre
@@ -112,14 +121,16 @@ La base des scores est dans `server/data/` (jamais versionnée).
 ### Structure
 - `src/main.js`, `src/config.js` : démarrage de Phaser et constantes (vitesse, gravité, cœurs, chrono, bonus)
 - `src/scenes/` : Menu, Game, GameOver, Victory, Settings, HighScores
-- `src/levels/levels.js` : les 5 niveaux (plateformes, fruits, pièges, caisses)
+- `src/levels/levels.js` : les 5 niveaux, dessinés en cartes ASCII (1 caractère = 1 tuile)
+- `src/levels/parseLevel.js` : légende des cartes et lecture des niveaux (partagé avec le serveur)
+- `scripts/check-levels.mjs` : `npm run check-levels` vérifie que chaque niveau est faisable (coupe,
+  fruits, caisses et checkpoints atteignables) et donne le temps du chemin le plus rapide
 - `src/entities/player/Player.js` : le héros (course, sauts, animations)
 - `src/controls.js` : touches modifiables, sauvegardées dans le navigateur
 - `src/audio/` : musique et bruitages (avec un synthé de secours si un son manque)
 - `src/ui/` : boutons, titres, curseurs, saisie du pseudo, liste des scores
 - `src/api/scores.js` : client de l'API
 - `server/` : API Express + SQLite
-- `docs/level-design/` : notes de conception des niveaux
 
 Pour contribuer, `AGENT.md` détaille l'architecture, les conventions et les pièges connus du moteur.
 

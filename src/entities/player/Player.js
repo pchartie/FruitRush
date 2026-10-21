@@ -52,7 +52,10 @@ export class Player {
     if (!this.sprite || !this.sprite.active) return;
 
     const body = this.sprite.body;
-    const onGround = body.blocked.down || body.touching.down;
+    // Seul un vrai appui compte (sol, plateforme, caisse : tous statiques → blocked).
+    // `touching.down` est aussi levé par un simple overlap (fruit, pointes, feu…),
+    // ce qui rendait le double saut en plein vol en touchant un fruit.
+    const onGround = body.blocked.down;
     const velX = Math.abs(body.velocity.x);
     const velY = body.velocity.y;
 

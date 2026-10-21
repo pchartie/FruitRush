@@ -20,22 +20,25 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { getTop, insertScore } from './db.js';
+import { LEVELS } from '../src/levels/levels.js';
+import { CONFIG } from '../src/config.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3001;
 const TOP_N = 15;
 const MAX_NAME_LEN = 20;
 
-// --- Barème, doit refléter src/config.js et src/levels/levels.js ---
-const N_LEVELS = 5;
-const FRUIT_MAX = { 1: 21, 2: 24, 3: 24, 4: 22, 5: 28 }; // fruits par niveau
-const BOX_MAX = 2;        // caisses par niveau
-const LEVEL_TIME = 60;    // CONFIG.levelTime → bonus temps max par niveau
-const LIFE_BONUS = 200;   // CONFIG.lifeBonus
-const MAX_LIVES = 3;      // CONFIG.maxLives
-// Garde-fou : score MAX réellement atteignable (compté) =
-//   fruits 1190 + caisses 500 + temps 300 + vies 600 = 2590.
-const MAX_SCORE = 2590;
+// --- Barème, lu dans les vrais niveaux (src/levels/levels.js) et src/config.js ---
+const N_LEVELS = Object.keys(LEVELS).length;
+const LEVEL_MAX = {};     // par niveau : fruits, caisses, bonus temps max
+for (const [num, L] of Object.entries(LEVELS)) {
+  LEVEL_MAX[num] = { fruits: L.fruitPositions.length, boxes: L.boxes.length, time: L.time || CONFIG.levelTime };
+}
+const LIFE_BONUS = CONFIG.lifeBonus;
+const MAX_LIVES = CONFIG.maxLives;
+// Garde-fou : score MAX réellement atteignable (tous les fruits, caisses, temps et vies).
+const MAX_SCORE = Object.values(LEVEL_MAX).reduce((sum, m) => sum + m.fruits * 10 + m.boxes * 50 + m.time, 0)
+  + MAX_LIVES * LIFE_BONUS;
 
 // --- Parties en cours (anti score arbitraire / anti-rejeu) ---
 const runs = new Map();                  // runId -> { startTs, submitted }
@@ -85,17 +88,17 @@ function computeScore(levels) {
   for (let i = 0; i < levels.length; i++) {
     const L = levels[i] || {};
     if (L.level !== i + 1) return { ok: false };          // séquence stricte
-    const fmax = FRUIT_MAX[L.level];
-    if (fmax === undefined) return { ok: false };
+    const max = LEVEL_MAX[L.level];
+    if (!max) return { ok: false };
     const { fruits, boxes, timeLeft, lives } = L;
-    if (!Number.isInteger(fruits) || fruits < 0 || fruits > fmax) return { ok: false };
-    if (!Number.isInteger(boxes) || boxes < 0 || boxes > BOX_MAX) return { ok: false };
+    if (!Number.isInteger(fruits) || fruits < 0 || fruits > max.fruits) return { ok: false };
+    if (!Number.isInteger(boxes) || boxes < 0 || boxes > max.boxes) return { ok: false };
     if (!Number.isInteger(lives) || lives < 0 || lives > MAX_LIVES) return { ok: false };
     const completed = L.completed === true;
     if (!completed && i !== levels.length - 1) return { ok: false }; // trou = game over final
     score += fruits * 10 + boxes * 50;
     if (completed) {
-      if (!Number.isInteger(timeLeft) || timeLeft < 0 || timeLeft > LEVEL_TIME) return { ok: false };
+      if (!Number.isInteger(timeLeft) || timeLeft < 0 || timeLeft > max.time) return { ok: false };
       score += timeLeft; // bonus temps
     } else {
       allCompleted = false;
